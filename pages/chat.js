@@ -7,8 +7,8 @@ import { ButtonSendSticker } from '../src/components/ButtonSendSticker';
 
 
 
-const SUPABASE_ANON_KEY = 'cole sua key publica do SUPABASE aqui';
-const SUPABASE_URL = 'cole sua URL do SUPABASE aqui';
+const SUPABASE_ANON_KEY = 'colar chave do BAAS aqui';
+const SUPABASE_URL = 'colar URL do BAAS aqui';
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function escutaMensagensEmTempoReal(adicionaMensagem){
@@ -84,6 +84,22 @@ export default function ChatPage() {
         setMensagem('');
     }
 
+    function apagaMensagem(key) {
+                
+
+        supabaseClient
+            .from('mensagens')
+            .delete()
+            .match({ id : key})
+            .then(({ data }) => {    
+                const listaFiltrada = listaDeMensagem.filter((x) => {
+                    return x.id != key;
+                });
+                setlistaDeMensagem(listaFiltrada);
+            });
+        
+    };
+
     return (
         <Box
             styleSheet={{
@@ -123,7 +139,7 @@ export default function ChatPage() {
                 >
 
 
-                    <MessageList mensagens={listaDeMensagem} />
+                    <MessageList mensagens={listaDeMensagem} apaga={apagaMensagem}/>
                     {/* Lista de Mensagens: {listaDeMensagem.map((mensagemAtual) => {
                         
                         return (
@@ -254,6 +270,29 @@ function MessageList(props) {
                             >
                                 {(new Date().toLocaleDateString())}
                             </Text>
+                            {/* desafio inserção de botão para excluir a mensagem */}
+                            <Button
+                                styleSheet={{
+                                    borderRadius: '5%',
+                                    marginLeft: '8px',                                
+                                    fontSize: '10px',                     
+                                    }
+                                  }                                
+                                onClick={() => {
+                                    console.log("Mandou apagar msg", mensagem.id);                                    
+                                    props.apaga(mensagem.id);
+                                }}
+                                label='X'
+                                buttonColors={{
+                                contrastColor: appConfig.theme.colors.neutrals["000"],
+                                mainColor: appConfig.theme.colors.primary[500],
+                                mainColorLight: appConfig.theme.colors.primary[400],
+                                // mainColorStrong: appConfig.theme.colors.primary[600],
+                                mainColorStrong: 'red',
+                                }}
+                            />
+
+                            
                         </Box>
                         {/* Condicional: {mensagem.texto.startsWith(':sticker:').toString()} */}
                         {mensagem.texto.startsWith(':sticker:')
